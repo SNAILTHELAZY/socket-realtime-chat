@@ -8,6 +8,8 @@ const io=new Server(server);
 
 const PORT=3000;
 
+const users={};
+
 app.use(express.static('public'));
 
 app.get('/',(req,res)=>{
@@ -19,27 +21,22 @@ io.on('connection',socket=>{
 
     socket.on('name',(name)=>{
         console.log(`incoming name: ${name}`);
-        socket.username=name;
-        io.emit('name',`${name} joined the server`);
-    });
-
-    socket.on('typing',(data)=>{
-        if(data.typing==true){
-            io.emit('typing',data.typing);
-        }
-        //io.emit('typing',msg);
+        users[socket.id]=name;
+        socket.broadcast.emit('user-connected',{name:users[socket.id],users:users});
     });
 
     socket.on('chat message',(msg)=>{
         console.log(`message: ${msg}`);
 
         //emit the message to all connected sockets
-        io.emit('chat message',socket.username+': '+msg);
+        socket.broadcast.emit('chat message',{name:users[socket.id],message:msg});
     });
 
     socket.on('disconnect',()=>{
-        console.log(`${socket.username} disconnected`);
-        io.emit('leave',`${socket.username} leave the chat`);
+        console.log(`${users[socket.id]} disconnected`);
+        socket.broadcast.emit('leave',{name:users[socket.id]});
+        delete users[socket.id];
+        io.emit('update-user-list',{users:users});
     });
 })
 

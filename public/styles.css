@@ -43,3 +43,16 @@ body {
   }
   #messages > li { padding: 0.5rem 1rem; }
   #messages > li:nth-child(odd) { background: #efefef; }
+
+  #users{
+    list-style-type: none;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+  }
+  #users li{
+    float:left;
+    text-align: center;
+    padding:16px;
+    color:green;
+  }
